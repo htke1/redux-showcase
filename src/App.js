@@ -2,40 +2,51 @@
 import './App.css';
 import InputSearch from './utils/InputSearch/InputSearch';
 import SearchResult from './utils/SearchResult/SearchResult';
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {useSelector, useDispatch} from 'react-redux';
 import {requestApiData} from './actions';
-function App(props) {
+function App() {
   const [value, setValue] = useState('');
-  const [jsonFile, setResult] = useState([])
 
   const dispatch = useDispatch();
-  const data = useSelector((state)=>state.data);
-  useEffect(()=>{
-   setResult(props.data);
-  },[props.data])
+  const dataFromReducer = useSelector((state)=>state.data);
+
+
+
 
   function handleChange(val){
     setValue(val);
     }
  
-    const handleClick = ()=>{
+    const handleClick = async ()=>{
     console.log("click");
-    dispatch(requestApiData())
+    console.log(value)
+    await dispatch(requestApiData(value))
+  
+  
     };
-   const {artistName} = data;
+
   return (
     <div className="App">
       <InputSearch handleChange={handleChange}  handleClick={handleClick} value={value} />
-      <SearchResult details={jsonFile}/>
-     
-
-       
-           <h3>{JSON.stringify(data)}</h3>
-         
-       
+      <SearchResult/>
     
-     {console.log(data)}
+       {
+          dataFromReducer.map((item, id) => {
+            let song='(Name not found)';
+            let artist = '(Name not found)'
+            if(item.song!==undefined){
+           song = item.song;}
+           artist = item.artist;
+            return (
+              <div key={id}>
+              <SearchResult id={item.id} song={song} artist={artist}/>
+             </div>
+            );
+        })
+}
+    
+     
     </div>
   );
 }
